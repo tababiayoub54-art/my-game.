@@ -23,13 +23,20 @@ if 'stage' not in st.session_state: st.session_state.stage = 'setup'
 if 'current_player_idx' not in st.session_state: st.session_state.current_player_idx = 0
 if 'show_role' not in st.session_state: st.session_state.show_role = False
 
-st.markdown("<h1 style='text-align: center; color: #E74C3C;'>🕵️ لـعـبـة Gusion</h1>", unsafe_allow_html=True)
-
-# عرض النقاط
+# زر إعادة تشغيل اللعبة من أي مكان
 with st.sidebar:
+    if st.button("🔄 إعادة ضبط اللعبة بالكامل", use_container_width=True):
+        st.session_state.stage = 'setup'
+        st.session_state.current_player_idx = 0
+        st.session_state.show_role = False
+        st.rerun()
+    
+    st.markdown("---")
     st.header("🏆 جدول النقاط")
     for player, score in st.session_state.scores.items():
         st.write(f"**{player}**: {score} نقطة")
+
+st.markdown("<h1 style='text-align: center; color: #E74C3C;'>🕵️ لـعـبـة Gusion</h1>", unsafe_allow_html=True)
 
 # --- 1. مرحلة الإعداد ---
 if st.session_state.stage == 'setup':
@@ -73,12 +80,13 @@ elif st.session_state.stage == 'distribute':
                 st.session_state.show_role = True
                 st.rerun()
         else:
-            st.write(f"اللاعب: {current_player}")
+            st.markdown(f"### اللاعب: {current_player}")
             if current_player in data['out_players']:
                 st.error("أنت برا 🕵️‍♂️")
+                # إصلاح عرض الشركاء: يظهر فقط إذا كان الخيار مفعلاً وهناك أكثر من واحد برا
                 if data['know_others'] and len(data['out_players']) > 1:
                     others = [p for p in data['out_players'] if p != current_player]
-                    st.info(f"شركاؤك: {', '.join(others)}")
+                    st.warning(f"شركاؤك هم: {', '.join(others)}")
             else:
                 st.success(f"الشيء هو: {data['word']}")
             
@@ -99,6 +107,7 @@ elif st.session_state.stage == 'voting':
     
     if current_voter_idx < len(voters):
         voter = voters[current_voter_idx]
+        st.write(f"دور اللاعب: **{voter}**")
         target = st.selectbox(f"يا {voter}، من برا؟", [p for p in voters if p != voter])
         if st.button(f"تأكيد تصويت {voter}"):
             data['votes'][voter] = target
@@ -113,7 +122,8 @@ elif st.session_state.stage == 'voting':
         else:
             st.error(f"خطأ! {suspect} كان داخل. اللي برا: {', '.join(data['out_players'])}")
             for p in data['out_players']: st.session_state.scores[p] += 2
-        if st.button("جولة جديدة 🔄"):
+        
+        if st.button("جولة جديدة 🔄", use_container_width=True):
             st.session_state.stage = 'setup'
             st.rerun()
 
