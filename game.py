@@ -2,12 +2,12 @@ import streamlit as st
 import random
 
 # إعدادات الصفحة
-st.set_page_config(page_title="لعبة السالفة الاحترافية", layout="centered")
+st.set_page_config(page_title="لعبة الشيء الاحترافية", layout="centered")
 
-# --- قاعدة البيانات ---
+# --- قاعدة البيانات المحدثة ---
 DATA = {
-    "أنمي 🐉": ["ون بيس", "ناروتو", "هجوم العمالقة", "دراجون بول", "قاتل الشياطين", "هنتر x هنتر", "كونان", "مذكرة الموت", "بليتش", "جوجوتسو كايسن", "طوكيو غول", "ماجيك كايتو", "فول ميتال ألكيميست", "بوكيمون", "كابتن ماجد", "هايكيو", "بلاك كلوفر", "ون بنش مان", "سول ليفيلينج", "أكاديمية بطلي"],
-    "مهن 🕵️‍♂️": ["نصاب", "حرامي", "مهرب", "جاسوس", "قاتل مأجور", "طيار", "طبيب جراح", "مبرمج", "حلاق", "رائد فضاء", "نجار", "محامي", "طباخ", "شرطي", "مزارع", "رسام", "ميكانيكي", "مدير بنك", "عامل نظافة", "وزير"],
+    "Anime 🐉": ["One Piece", "Naruto", "Attack on Titan", "Dragon Ball", "Demon Slayer", "Hunter x Hunter", "Detective Conan", "Death Note", "Bleach", "Jujutsu Kaisen", "Tokyo Ghoul", "Magic Kaito", "Fullmetal Alchemist", "Pokemon", "Captain Tsubasa", "Haikyuu", "Black Clover", "One Punch Man", "Solo Leveling", "My Hero Academia"],
+    "المهن 👨‍🔧": ["نصاب", "حرامي", "مهرب", "جاسوس", "قاتل مأجور", "طيار", "طبيب جراح", "مبرمج", "حلاق", "رائد فضاء", "نجار", "محامي", "طباخ", "شرطي", "مزارع", "رسام", "ميكانيكي", "مدير بنك", "عامل نظافة", "وزير"],
     "حيوانات 🦁": ["أسد", "زرافة", "بطريق", "تمساح", "نمر", "فيل", "قرد", "دلفين", "ثعبان", "خفاش", "كنغر", "سنجاب", "أرنب", "حصان", "جمل", "ذئب", "ثعلب", "حوت", "قرش", "نسر", "صقر", "بومة", "فهد", "غزال", "حمار وحشي", "دب قطبي", "فرس النهر", "وحيد القرن", "نملة", "نحلة", "عنكبوت", "عقرب", "طاووس", "نعامة", "قنفذ", "سلحفاة", "كوالا"],
     "أماكن 🗺️": ["المستشفى", "المطار", "المدرسة", "الغابة", "السينما", "المطعم", "المتحف", "القمر", "الشاطئ", "ملعب كرة قدم", "سجن", "قصر المهجور", "محطة فضاء", "منجم ذهب", "مكتبة قديمة"],
     "أشياء عشوائية 📦": ["كأس", "فوطة", "وسادة", "تيشيرت", "صندل", "ساعة يد", "نظارة", "مظلة", "حقيبة", "سجادة", "مفتاح", "قلم", "جوال", "شاحن", "ملعقة", "سكين", "مروحة", "كنبة", "لوحة فنية", "مزهرية", "مشط", "مقص", "خريطة", "بوصلة", "كمامة", "عطر", "ولاعة", "طفاية حريق", "مطرقة", "مسمار"]
@@ -23,7 +23,7 @@ if 'stage' not in st.session_state: st.session_state.stage = 'setup'
 if 'current_player_idx' not in st.session_state: st.session_state.current_player_idx = 0
 if 'show_role' not in st.session_state: st.session_state.show_role = False
 
-st.markdown("<h1 style='text-align: center; color: #E74C3C;'>🕵️ لـعـبـة السـالـفـة</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #E74C3C;'>🕵️ لـعـبـة الـشـيء</h1>", unsafe_allow_html=True)
 
 # عرض النقاط في الجانب
 with st.sidebar:
@@ -36,7 +36,7 @@ if st.session_state.stage == 'setup':
     st.session_state.current_player_idx = 0
     st.session_state.show_role = False
     st.subheader("🛠️ إعدادات الجولة")
-    category = st.selectbox("اختر نوع السالفة:", list(DATA.keys()))
+    category = st.selectbox("اختر نوع الشيء:", list(DATA.keys()))
     names_input = st.text_area("أسماء اللاعبين (اسم في كل سطر):", "أحمد\nأيوب\nسارة")
     players = [n.strip() for n in names_input.split('\n') if n.strip()]
     
@@ -82,12 +82,12 @@ elif st.session_state.stage == 'distribute':
         else:
             st.markdown(f"### اللاعب الحالي: **{current_player}**")
             if current_player in data['out_players']:
-                st.error("🤫 أنت برا السالفة!")
+                st.error("🤫 أنت برا الشيء!")
                 if data['know_others'] and len(data['out_players']) > 1:
                     others = [p for p in data['out_players'] if p != current_player]
-                    st.info(f"شركاؤك اللي برا السالفة هم: {', '.join(others)}")
+                    st.info(f"شركاؤك اللي برا هم: {', '.join(others)}")
             else:
-                st.success(f"✅ أنت داخل السالفة! الكلمة هي: **{data['word']}**")
+                st.success(f"✅ أنت داخل الشيء! الشيء هو: **{data['word']}**")
             
             if st.button("فهمت، اخفاء المعلومة ➡️", use_container_width=True):
                 st.session_state.show_role = False
@@ -108,7 +108,7 @@ elif st.session_state.stage == 'voting':
     if current_voter_idx < len(voters):
         voter = voters[current_voter_idx]
         st.markdown(f"### دور اللاعب: <span style='color:#E74C3C;'>{voter}</span> ليصوت سرياً", unsafe_allow_html=True)
-        target = st.selectbox(f"يا {voter}، من برا السالفة؟", [p for p in voters if p != voter], key=f"v_{voter}")
+        target = st.selectbox(f"يا {voter}، من برا الشيء؟", [p for p in voters if p != voter], key=f"v_{voter}")
         
         if st.button(f"تأكيد تصويت {voter}"):
             data['votes'][voter] = target
@@ -120,19 +120,19 @@ elif st.session_state.stage == 'voting':
         st.write(f"أكثر شخص تم التصويت عليه هو: **{suspect}**")
         
         if suspect in data['out_players']:
-            st.success(f"اجابة صحيحة! **{suspect}** كان برا السالفة. الكلمة: {data['word']}")
+            st.success(f"اجابة صحيحة! **{suspect}** كان برا الشيء. الشيء كان: {data['word']}")
             for p in data['players']:
                 if p not in data['out_players']: st.session_state.scores[p] += 1
         else:
-            st.error(f"خطأ! **{suspect}** كان داخل السالفة. اللي برا هم: {', '.join(data['out_players'])}")
+            st.error(f"خطأ! **{suspect}** كان داخل الشيء. اللي برا هم: {', '.join(data['out_players'])}")
             for p in data['out_players']: st.session_state.scores[p] += 2
 
         if st.button("جولة جديدة 🔄", use_container_width=True):
             st.session_state.stage = 'setup'
             st.rerun()
 
-# تحسين مظهر الأزرار
 st.markdown("<style>.stButton>button { border-radius: 15px; font-weight: bold; border: 2px solid #E74C3C; }</style>", unsafe_allow_html=True)
+
 
 
 
