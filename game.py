@@ -60,7 +60,7 @@ if st.session_state.stage == 'setup':
             st.session_state.stage = 'distribute'
             st.rerun()
 
-# --- 2. مرحلة توزيع الأدوار (أعطِ الهاتف لـ...) ---
+# --- 2. مرحلة توزيع الأدوار ---
 elif st.session_state.stage == 'distribute':
     data = st.session_state.game_data
     idx = st.session_state.current_player_idx
@@ -110,6 +110,29 @@ elif st.session_state.stage == 'voting':
         st.markdown(f"### دور اللاعب: <span style='color:#E74C3C;'>{voter}</span> ليصوت سرياً", unsafe_allow_html=True)
         target = st.selectbox(f"يا {voter}، من برا السالفة؟", [p for p in voters if p != voter], key=f"v_{voter}")
         
-        if st.
+        if st.button(f"تأكيد تصويت {voter}"):
+            data['votes'][voter] = target
+            st.rerun()
+    else:
+        vote_counts = {p: list(data['votes'].values()).count(p) for p in data['players']}
+        suspect = max(vote_counts, key=vote_counts.get)
+        
+        st.write(f"أكثر شخص تم التصويت عليه هو: **{suspect}**")
+        
+        if suspect in data['out_players']:
+            st.success(f"اجابة صحيحة! **{suspect}** كان برا السالفة. الكلمة: {data['word']}")
+            for p in data['players']:
+                if p not in data['out_players']: st.session_state.scores[p] += 1
+        else:
+            st.error(f"خطأ! **{suspect}** كان داخل السالفة. اللي برا هم: {', '.join(data['out_players'])}")
+            for p in data['out_players']: st.session_state.scores[p] += 2
+
+        if st.button("جولة جديدة 🔄", use_container_width=True):
+            st.session_state.stage = 'setup'
+            st.rerun()
+
+# تحسين مظهر الأزرار
+st.markdown("<style>.stButton>button { border-radius: 15px; font-weight: bold; border: 2px solid #E74C3C; }</style>", unsafe_allow_html=True)
+
 
 
