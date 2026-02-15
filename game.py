@@ -17,15 +17,17 @@ all_items = []
 for items in DATA.values(): all_items.extend(items)
 DATA["🎲 عشوائي (كل شيء)"] = all_items
 
-# --- إدارة الحالة ---
+# --- إدارة الحالة (إصلاح حفظ الأسماء) ---
 if 'scores' not in st.session_state: st.session_state.scores = {}
 if 'stage' not in st.session_state: st.session_state.stage = 'setup'
 if 'current_player_idx' not in st.session_state: st.session_state.current_player_idx = 0
 if 'show_role' not in st.session_state: st.session_state.show_role = False
+# حفظ الأسماء الافتراضية
+if 'saved_names' not in st.session_state: st.session_state.saved_names = "أحمد\nأيوب\nسارة"
 
-# زر إعادة تشغيل اللعبة من أي مكان
+# زر إعادة تشغيل اللعبة
 with st.sidebar:
-    if st.button("🔄 إعادة ضبط اللعبة بالكامل", use_container_width=True):
+    if st.button("🔄 إعادة ضبط الجولة", use_container_width=True):
         st.session_state.stage = 'setup'
         st.session_state.current_player_idx = 0
         st.session_state.show_role = False
@@ -43,19 +45,26 @@ if st.session_state.stage == 'setup':
     st.session_state.current_player_idx = 0
     st.session_state.show_role = False
     st.subheader("🛠️ إعدادات الجولة")
+    
     category = st.selectbox("اختر النوع:", list(DATA.keys()))
-    names_input = st.text_area("أسماء اللاعبين:", "أحمد\nأيوب\nسارة")
+    
+    # استخدام القيمة المحفوظة للأسماء
+    names_input = st.text_area("أسماء اللاعبين:", value=st.session_state.saved_names)
+    st.session_state.saved_names = names_input # تحديث الحفظ فوراً
+    
     players = [n.strip() for n in names_input.split('\n') if n.strip()]
     
     col1, col2 = st.columns(2)
-    with col1: out_count = st.number_input("العدد اللي برا:", 1, max(1, len(players)-1), 1)
+    with col1: out_count = st.number_input("العدد اللي برا:", 1, max(1, len(players)-1) if len(players) > 1 else 1, 1)
     with col2: know_others = st.checkbox("اللي برا يعرفون بعض؟")
 
     if st.button("ابدأ اللعبة 🔥", use_container_width=True):
         if len(players) < 3: st.error("أدخل 3 لاعبين على الأقل!")
         else:
+            # تحديث جدول النقاط للاعبين الجدد فقط والحفاظ على القدامى
             for p in players:
                 if p not in st.session_state.scores: st.session_state.scores[p] = 0
+            
             st.session_state.game_data = {
                 "players": players,
                 "out_players": random.sample(players, int(out_count)),
@@ -83,7 +92,6 @@ elif st.session_state.stage == 'distribute':
             st.markdown(f"### اللاعب: {current_player}")
             if current_player in data['out_players']:
                 st.error("أنت برا 🕵️‍♂️")
-                # إصلاح عرض الشركاء: يظهر فقط إذا كان الخيار مفعلاً وهناك أكثر من واحد برا
                 if data['know_others'] and len(data['out_players']) > 1:
                     others = [p for p in data['out_players'] if p != current_player]
                     st.warning(f"شركاؤك هم: {', '.join(others)}")
@@ -108,7 +116,7 @@ elif st.session_state.stage == 'voting':
     if current_voter_idx < len(voters):
         voter = voters[current_voter_idx]
         st.write(f"دور اللاعب: **{voter}**")
-        target = st.selectbox(f"يا {voter}، من برا؟", [p for p in voters if p != voter])
+        target = st.selectbox(f"يا {voter}، من تشك أنه برا؟", [p for p in voters if p != voter])
         if st.button(f"تأكيد تصويت {voter}"):
             data['votes'][voter] = target
             st.rerun()
@@ -128,4 +136,3 @@ elif st.session_state.stage == 'voting':
             st.rerun()
 
 st.markdown("<style>.stButton>button { border-radius: 15px; font-weight: bold; border: 2px solid #E74C3C; }</style>", unsafe_allow_html=True)
-
